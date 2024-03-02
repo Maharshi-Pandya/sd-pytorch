@@ -2,11 +2,14 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 from torch.nn import functional as F
-from attention import SelfAttention
+from attention import SelfAttentionBlock
 
 
 # Number of groups for GroupNorm along features dimension
 n_groups = 32
+
+# Number of heads for self attention
+n_sattn_heads = 1
 
 
 class VAE_AttentionBlock(nn.Module):
@@ -19,8 +22,8 @@ class VAE_AttentionBlock(nn.Module):
     def __init__(self, channels: int):
         super(VAE_AttentionBlock, self).__init__()
 
-        self.gn = nn.GroupNorm(32, channels)
-        self.attention = SelfAttention(1, channels)     # n_heads, n_features
+        self.gn = nn.GroupNorm(n_groups, channels)
+        self.attention = SelfAttentionBlock(n_sattn_heads, channels)     # n_heads, n_features
 
     def forward(self, x: torch.Tensor):
         # shape x: (n, c, h, w)
